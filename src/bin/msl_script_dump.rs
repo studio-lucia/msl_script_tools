@@ -29,7 +29,7 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
         // the loop are relative to this chunk, not the beginning of
         // the file.
         let start = chunk.start as usize;
-        let end = start + chunk.start as usize;
+        let end = start + chunk.length as usize;
         let chunk_data = &data[start..end];
 
         let map_table = MapTable::parse(&chunk_data[0..20])?;
