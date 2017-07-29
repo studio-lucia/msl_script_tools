@@ -80,7 +80,13 @@ impl DialogueOffsetTable {
             let mut string = vec![];
             string.extend(data[range]
                 .iter()
+                // 0x08 is the string terminator; usually two bytes as 0x0800
                 .take_while(|c| **c != 0x08)
+                // Strings shouldn't have NUL bytes because of the above, but
+                // at least some pointers are pointing into padding data that
+                // doesn't end in 0x08 but does contain long series of 0x00s.
+                // We should strip those to avoid confusing CSV parsers.
+                .take_while(|c| **c != 0x00)
                 .collect::<Vec<&u8>>());
             let (cow, _, _) = SHIFT_JIS.decode(&string);
             dialogue.push(Dialogue {
