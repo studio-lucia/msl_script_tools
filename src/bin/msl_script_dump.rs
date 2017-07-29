@@ -83,8 +83,13 @@ fn main() {
             }
         }
         println!("Writing output for file: {}", input_file);
-        let output = File::create(input_file + ".csv").unwrap();
-        let mut writer = csv::Writer::from_writer(output);
+        let input_path = Path::new(&input_file);
+        let new_filename = format!("{}.csv",
+                                   input_path.file_stem().unwrap().to_str().unwrap());
+        let output_file_path = output_path.join(new_filename);
+        let output_file = File::create(&output_file_path).unwrap();
+
+        let mut writer = csv::Writer::from_writer(output_file);
         for line in dialogue {
             writer.serialize(line).unwrap();
         }
