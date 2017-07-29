@@ -51,8 +51,7 @@ impl DialogueOffsetTable {
 
         let mut offsets = vec![];
 
-        debug_assert!(length % 4 == 0);
-        for _ in 1..length / 4 {
+        for _ in 0..length {
             offsets.push(slice.read_u32::<BigEndian>()?);
         }
         return Ok(DialogueOffsetTable {
