@@ -61,7 +61,7 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
 
 fn main() {
     let matches = App::new("msl_script_dump")
-                          .version("0.1.0")
+                          .version("0.2.0")
                           .author("Misty De Meo")
                           .about("Extract Magical School Lunar! script data")
                           .arg(Arg::with_name("input")
