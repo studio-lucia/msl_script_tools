@@ -36,7 +36,8 @@ impl MapTable {
 
         let unknown1 = slice.read_u32::<BigEndian>()?;
         let dialogue_header_offset = slice.read_u32::<BigEndian>()?;
-        let mut unknown2 = vec![0; 48];
+
+        let mut unknown2 = vec![0; dialogue_header_offset as usize - 8];
         slice.read_exact(&mut unknown2)?;
         let number_of_dialogue_entries = slice.read_u32::<BigEndian>()?;
         let dialogue_offset_table_offset = slice.read_u32::<BigEndian>()?;
