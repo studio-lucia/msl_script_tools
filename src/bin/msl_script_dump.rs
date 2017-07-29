@@ -30,6 +30,17 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
         // the file.
         let start = chunk.start as usize;
         let end = start + chunk.length as usize;
+
+        // TODO: fldtools probably shouldn't be handing out chunks with
+        // zero starting positions or zero lengths. But we'll skip for now.
+        if chunk.start == 0 {
+            println!("Chunk {} starts at an invalid position; skipping", i);
+            continue;
+        } else if chunk.length == 0 {
+            println!("Chunk {} has an invalid length; skipping", i);
+            continue;
+        }
+
         let chunk_data = &data[start..end];
 
         let map_table = MapTable::parse(chunk_data)?;
