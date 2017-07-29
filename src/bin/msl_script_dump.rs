@@ -32,7 +32,7 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
         let end = start + chunk.length as usize;
         let chunk_data = &data[start..end];
 
-        let map_table = MapTable::parse(&chunk_data[0..20])?;
+        let map_table = MapTable::parse(&chunk_data[0..64])?;
         let range = map_table.dialogue_header_offset as usize..map_table.dialogue_offset_table_offset as usize;
 
         let dialogue_table = DialogueOffsetTable::parse(&chunk_data[range], map_table.number_of_dialogue_entries)?;

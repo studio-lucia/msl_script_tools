@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Read;
 
 extern crate byteorder;
 use byteorder::{BigEndian, ReadBytesExt};
@@ -16,7 +17,7 @@ pub struct MapTable {
     unknown1: u32,
     pub dialogue_header_offset: u32,
     #[allow(dead_code)]
-    unknown2: u32,
+    unknown2: Vec<u8>,
     pub number_of_dialogue_entries: u32,
     pub dialogue_offset_table_offset: u32,
 }
@@ -33,12 +34,19 @@ impl MapTable {
         data_copy.copy_from_slice(data);
         let mut slice = data_copy.as_slice();
 
+        let unknown1 = slice.read_u32::<BigEndian>()?;
+        let dialogue_header_offset = slice.read_u32::<BigEndian>()?;
+        let mut unknown2 = vec![0; 48];
+        slice.read_exact(&mut unknown2)?;
+        let number_of_dialogue_entries = slice.read_u32::<BigEndian>()?;
+        let dialogue_offset_table_offset = slice.read_u32::<BigEndian>()?;
+
         return Ok(MapTable {
-            unknown1: slice.read_u32::<BigEndian>()?,
-            dialogue_header_offset: slice.read_u32::<BigEndian>()?,
-            unknown2: slice.read_u32::<BigEndian>()?,
-            number_of_dialogue_entries: slice.read_u32::<BigEndian>()?,
-            dialogue_offset_table_offset: slice.read_u32::<BigEndian>()?,
+            unknown1: unknown1,
+            dialogue_header_offset: dialogue_header_offset,
+            unknown2: unknown2,
+            number_of_dialogue_entries: number_of_dialogue_entries,
+            dialogue_offset_table_offset: dialogue_offset_table_offset,
         });
     }
 }
