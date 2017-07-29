@@ -45,6 +45,11 @@ impl MapTable {
 
 impl DialogueOffsetTable {
     pub fn parse(data : &[u8], length : u32) -> io::Result<DialogueOffsetTable> {
+        // The length isn't strictly necessary given we can calculate it
+        // from the length of the data section passed, but might as well
+        // verify it's the case.
+        debug_assert!(data.len() / 4 == length as usize);
+
         let mut data_copy = vec![0; data.len()];
         data_copy.copy_from_slice(data);
         let mut slice = data_copy.as_slice();
