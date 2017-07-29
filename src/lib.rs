@@ -89,12 +89,16 @@ impl DialogueOffsetTable {
                 .take_while(|c| **c != 0x00)
                 .collect::<Vec<&u8>>());
             let (cow, _, _) = SHIFT_JIS.decode(&string);
+            let unicode_string = cow.into_owned()
+                                    // The one character different between standard SJIS,
+                                    // and the SJIS used by this game.
+                                    .replace("曖", "❤");
             dialogue.push(Dialogue {
                 chunk: format!("{}", chunk),
                 offset: format!("{:#X}", offset),
                 character: String::from(""),
                 expression: String::from(""),
-                japanese: cow.into_owned(),
+                japanese: unicode_string,
                 english: String::from(""),
             });
         }
