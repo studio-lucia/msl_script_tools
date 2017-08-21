@@ -87,17 +87,22 @@ impl DialogueOffsetTable {
 
             let range = start..end;
             let mut string = vec![];
-            string.extend(data[range]
-                .iter()
-                // 0x08 is the string terminator; usually two bytes as 0x0800
-                .take_while(|c| **c != 0x08)
-                // Strings shouldn't have NUL bytes because of the above, but
-                // at least some pointers are pointing into padding data that
-                // doesn't end in 0x08 but does contain long series of 0x00s.
-                // We should strip those to avoid confusing CSV parsers.
-                .take_while(|c| **c != 0x00)
-                .collect::<Vec<&u8>>());
-            let (cow, _, _) = SHIFT_JIS.decode(&string);
+
+            for byte in data[range].iter() {
+                match byte {
+                    // Wait for player input replaced by two newlines
+                    &0x08 => string.extend(&[10, 10]),
+                    // Clear textbox, then keep printing; replaced by \c
+                    &0x0C => string.extend(&[92, 99]),
+                    // Printing delay; replaced by \p
+                    &0x0D => string.extend(&[92, 112]),
+                    // NUL byte indicates end of string
+                    &0x00 => break,
+                    _ => string.push(*byte),
+                }
+            }
+
+            let (cow, _, _) = SHIFT_JIS.decode(string.as_slice());
             let unicode_string = cow.into_owned()
                                     // The one character different between standard SJIS,
                                     // and the SJIS used by this game.
