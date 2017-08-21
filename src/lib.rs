@@ -76,8 +76,16 @@ impl DialogueOffsetTable {
     pub fn extract_lines(self, data : &[u8], chunk : usize) -> io::Result<Vec<Dialogue>> {
         let mut dialogue = vec![];
 
-        for offset in self.offsets {
-            let range = offset as usize..data.len();
+        let mut iter = self.offsets.iter().peekable();
+
+        while let Some(offset) = iter.next() {
+            let start = *offset as usize;
+            let end = match iter.peek() {
+                Some(val) => **val as usize,
+                None => data.len(),
+            };
+
+            let range = start..end;
             let mut string = vec![];
             string.extend(data[range]
                 .iter()
