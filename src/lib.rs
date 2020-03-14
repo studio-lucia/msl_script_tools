@@ -22,7 +22,7 @@ pub struct DialogueOffsetTable {
 }
 
 impl MapTable {
-    pub fn parse(data : &[u8]) -> io::Result<MapTable> {
+    pub fn parse(data: &[u8]) -> io::Result<MapTable> {
         // read methods are destructive; we copy the data here
         // to avoid mutating the original data structure.
         let mut data_copy = vec![0; data.len()];
@@ -48,7 +48,7 @@ impl MapTable {
 }
 
 impl DialogueOffsetTable {
-    pub fn parse(data : &[u8], length : u32) -> io::Result<DialogueOffsetTable> {
+    pub fn parse(data: &[u8], length: u32) -> io::Result<DialogueOffsetTable> {
         // The length isn't strictly necessary given we can calculate it
         // from the length of the data section passed, but might as well
         // verify it's the case.
@@ -63,12 +63,10 @@ impl DialogueOffsetTable {
         for _ in 0..length {
             offsets.push(slice.read_u32::<BigEndian>()?);
         }
-        return Ok(DialogueOffsetTable {
-            offsets: offsets,
-        });
+        return Ok(DialogueOffsetTable { offsets: offsets });
     }
 
-    pub fn extract_lines(self, data : &[u8], chunk : usize) -> io::Result<Vec<Dialogue>> {
+    pub fn extract_lines(self, data: &[u8], chunk: usize) -> io::Result<Vec<Dialogue>> {
         let mut dialogue = vec![];
 
         let mut iter = self.offsets.iter().peekable();
@@ -98,10 +96,11 @@ impl DialogueOffsetTable {
             }
 
             let (cow, _, _) = SHIFT_JIS.decode(string.as_slice());
-            let unicode_string = cow.into_owned()
-                                    // The one character different between standard SJIS,
-                                    // and the SJIS used by this game.
-                                    .replace("曖", "❤");
+            let unicode_string = cow
+                .into_owned()
+                // The one character different between standard SJIS,
+                // and the SJIS used by this game.
+                .replace("曖", "❤");
             dialogue.push(Dialogue {
                 chunk: format!("{}", chunk),
                 offset: format!("{:#X}", offset),

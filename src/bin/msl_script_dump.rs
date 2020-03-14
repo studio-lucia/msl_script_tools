@@ -4,14 +4,14 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::process::exit;
 
-use clap::{Arg, App};
+use clap::{App, Arg};
 use csv;
 use fldtools::ChunkList;
 
 extern crate msl_script_tools;
 use msl_script_tools::{Dialogue, DialogueOffsetTable, MapTable};
 
-fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
+fn process_file(input_file: &String) -> io::Result<Vec<Dialogue>> {
     let mut dialogue = vec![];
 
     let mut data = vec![];
@@ -41,11 +41,12 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
 
         let map_table = MapTable::parse(chunk_data)?;
 
-        let length = map_table.dialogue_offset_table_offset as usize + 
-                     (map_table.number_of_dialogue_entries * 4) as usize;
+        let length = map_table.dialogue_offset_table_offset as usize
+            + (map_table.number_of_dialogue_entries * 4) as usize;
         let range = map_table.dialogue_offset_table_offset as usize..length;
 
-        let dialogue_table = DialogueOffsetTable::parse(&chunk_data[range], map_table.number_of_dialogue_entries)?;
+        let dialogue_table =
+            DialogueOffsetTable::parse(&chunk_data[range], map_table.number_of_dialogue_entries)?;
 
         // OK, now that we have the table, we can start extracting
         // dialogue chunks
@@ -57,20 +58,28 @@ fn process_file(input_file : &String) -> io::Result<Vec<Dialogue>> {
 
 fn main() {
     let matches = App::new("msl_script_dump")
-                          .version("0.2.0")
-                          .author("Misty De Meo")
-                          .about("Extract Magical School Lunar! script data")
-                          .arg(Arg::with_name("input")
-                              .help("Script files to process")
-                              .required(true)
-                              .multiple(true))
-                          .arg(Arg::with_name("output")
-                              .help("Directory to write script CSVs to")
-                              .short("o")
-                              .long("output")
-                              .takes_value(true))
-                          .get_matches();
-    let input_files = matches.values_of("input").unwrap().map(|path| String::from(path)).collect::<Vec<String>>();
+        .version("0.2.0")
+        .author("Misty De Meo")
+        .about("Extract Magical School Lunar! script data")
+        .arg(
+            Arg::with_name("input")
+                .help("Script files to process")
+                .required(true)
+                .multiple(true),
+        )
+        .arg(
+            Arg::with_name("output")
+                .help("Directory to write script CSVs to")
+                .short("o")
+                .long("output")
+                .takes_value(true),
+        )
+        .get_matches();
+    let input_files = matches
+        .values_of("input")
+        .unwrap()
+        .map(|path| String::from(path))
+        .collect::<Vec<String>>();
     if input_files.iter().any(|path| !Path::new(path).exists()) {
         println!("One or more input files couldn't be found!");
         exit(1);
@@ -88,14 +97,16 @@ fn main() {
         match process_file(&input_file) {
             Ok(lines) => dialogue = lines,
             Err(e) => {
-                println!("Error trying to extract dialogue from script {}: {}", input_file, e);
+                println!(
+                    "Error trying to extract dialogue from script {}: {}",
+                    input_file, e
+                );
                 exit(1);
             }
         }
         println!("Writing output for file: {}", input_file);
         let input_path = Path::new(&input_file);
-        let new_filename = format!("{}.csv",
-                                   input_path.file_stem().unwrap().to_str().unwrap());
+        let new_filename = format!("{}.csv", input_path.file_stem().unwrap().to_str().unwrap());
         let output_file_path = output_path.join(new_filename);
         let output_file = File::create(&output_file_path).unwrap();
 
