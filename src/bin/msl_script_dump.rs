@@ -4,12 +4,8 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::process::exit;
 
-extern crate clap;
 use clap::{Arg, App};
-
-extern crate csv;
-
-extern crate fldtools;
+use csv;
 use fldtools::ChunkList;
 
 extern crate msl_script_tools;

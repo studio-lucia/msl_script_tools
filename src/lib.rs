@@ -1,12 +1,7 @@
 use std::io;
 use std::io::Read;
 
-extern crate byteorder;
 use byteorder::{BigEndian, ReadBytesExt};
-
-extern crate csv;
-
-extern crate encoding_rs;
 use encoding_rs::SHIFT_JIS;
 
 #[macro_use]
